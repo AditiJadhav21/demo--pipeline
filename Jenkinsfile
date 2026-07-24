@@ -11,5 +11,33 @@ pipeline {
                 echo 'Building'
             }
         }
+        stage('Tests') {
+            parallel {
+                stage('Unit') {
+                    steps {
+                        sh 'echo Unit tests'
+                    }
+                }
+                stage('Integration') {
+                    steps {
+                        sh 'echo Integration tests'
+                    }
+                }
+            }
+        }
+        stage('Approve') {
+            when {
+                expression { params.ENVIRONMENT == 'production' }
+            }
+            steps {
+                input message: 'Deploy to production?'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh "echo Deploying to ${params.ENVIRONMENT}"
+            }
+        }
     }
 }
+
